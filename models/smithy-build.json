@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "projections": {
+    "openapi-deploy": {
+      "plugins": {
+        "openapi": {
+          "service": "ims.core#ImsCore",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    },
+    "openapi-yaml": {
+      "plugins": {
+        "openapi": {
+          "service": "ims.core#ImsCore",
+          "protocol": "aws.protocols#restJson1"
+        }
+      }
+    }
+  }
+}

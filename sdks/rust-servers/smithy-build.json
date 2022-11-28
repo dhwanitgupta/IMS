@@ -1,0 +1,18 @@
+{
+  "version": "2.0",
+  "projections": {
+    "core": {
+      "plugins": {
+        "rust-server-codegen": {
+          "service": "ims.core#ImsCore",
+          "module": "liwimean-ims-core-server-sdk",
+          "moduleDescription": "Rust server SDK for IMS Core",
+          "moduleVersion": "0.0.1",
+          "moduleAuthors": [
+            "Dhwanit Gupta <dhwanitgupta123@gmail.com>"
+          ]
+        }
+      }
+    }
+  }
+}

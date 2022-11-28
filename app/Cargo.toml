@@ -6,3 +6,20 @@ edition = "2021"
 [[bin]]
 name = "core"
 path = "src/main.rs"
+
+[dependencies]
+hyper = { version = "0.14", features = ["server", "http1"] }
+log = "0.4"
+clap = { version = "4.0.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+liwimean-ims-core-server-sdk = { path = "../sdks/rust-servers/build/output/core/rust-server-codegen" }
+tower = "0.4"
+tower-http = { version = "0.3", features = ["trace", "cors"] }
+aws-smithy-http-server = "0.48.0"
+env_logger = "0.9"
+uuid = { version = "1.1", features = ["v4"] }
+dashmap = "5.3"
+csv = "1.1"
+serde = { version = "1", features = ["derive"] }
+chrono = "0.4.23"

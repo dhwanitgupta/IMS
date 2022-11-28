@@ -8,4 +8,26 @@
  */
 
 rootProject.name = "InvestmentManagementService"
+includeBuild("smithy-rs")
+include(":models")
 include("app")
+include(":sdks:rust-servers")
+include(":sdks:dart-clients")
+include(":web_app")
+
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    val smithyVersion: String by settings
+    dependencies {
+        classpath("software.amazon.smithy:smithy-aws-traits:$smithyVersion")
+    }
+}
+
+plugins {
+    id("software.amazon.smithy").version("0.6.0").apply(false)
+    kotlin("jvm").version("1.6.10").apply(false)
+}
