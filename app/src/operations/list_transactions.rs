@@ -21,6 +21,7 @@ use liwimean_ims_core_server_sdk::output::ListTransactionsOutput;
 use liwimean_ims_core_server_sdk::types::DateTime;
 use log::info;
 use std::fs;
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use serde::Deserialize;
@@ -31,6 +32,11 @@ pub async fn do_list_transactions(
 ) -> Result<ListTransactionsOutput, ListTransactionsError> {
     let result = state.resources_map.get(input.tlr()).unwrap();
     let path = &result.transaction_path;
+
+    Ok(get_transaction_output(path))
+}
+
+pub fn get_transaction_output(path: &PathBuf) -> ListTransactionsOutput {
     let files = path.read_dir().unwrap();
 
     let mut transaction_records = vec![];
@@ -63,10 +69,10 @@ pub async fn do_list_transactions(
 
     let aggregate = get_aggregate_view(trasactions_summaries.as_ref());
 
-    Ok(ListTransactionsOutput {
+    ListTransactionsOutput {
         transactions: trasactions_summaries,
         aggregate,
-    })
+    }
 }
 
 fn get_total_by_type(
@@ -176,29 +182,30 @@ fn map_to_summaries(records: Vec<TransactionRecord>) -> Vec<TransactionSummary> 
             amount: get_transaction_amount(&record),
             transaction_date: get_transaction_date(&record),
             transaction_purpose: get_transaction_purpose(&record),
+            transaction_date_string: Option::from(record.transaction_date.unwrap().to_string()),
         });
     }
 
     summaries
-        .iter()
-        .cloned()
-        .filter(|summary| {
-            summary
+    /*.iter()
+    .cloned()
+    .filter(|summary| {
+        summary
+            .transaction_purpose()
+            .unwrap()
+            .category()
+            .unwrap()
+            .clone()
+            == TransactionCategory::Others
+            && summary
                 .transaction_purpose()
                 .unwrap()
-                .category()
+                .sub_category()
                 .unwrap()
                 .clone()
-                == TransactionCategory::Others
-                && summary
-                    .transaction_purpose()
-                    .unwrap()
-                    .sub_category()
-                    .unwrap()
-                    .clone()
-                    == TransactionSubCategory::Others
-        })
-        .collect()
+                == TransactionSubCategory::Others
+    })
+    .collect()*/
 }
 
 fn get_category_from_subcategory(sub_category: TransactionSubCategory) -> TransactionCategory {

@@ -1,35 +1,37 @@
-import 'dart:async';
 import 'package:ims_dart_client/api.dart';
-
-import '../models/transaction_summary.dart' as TS;
+import 'package:web_app/data_sources/ims_post_client.dart';
+import '../models/credit_debit_model.dart';
+import '../models/debit_by_category_model.dart';
 
 class TransactionSummaryDataSource {
-  static const String TRANSACTION_SUMMARY_API_URL =
-      "http://127.0.0.1:12446";
+  static const String TRANSACTION_SUMMARY_API_URL = "http://127.0.0.1:12446";
+  CreditDebitModel creditDebitModel;
+  AggregationByCategoryModel debitByCategoryModel, creditByCategoryModel;
 
-  TS.TransactionSummary fetch()  {
+  TransactionSummaryDataSource({required this.creditDebitModel, required this.debitByCategoryModel, required  this.creditByCategoryModel});
 
-    final apiInstance = DefaultApi(ApiClient(basePath: TRANSACTION_SUMMARY_API_URL));
-    TS.TransactionSummary result = const TS.TransactionSummary(totalCredit: 1600, totalDebit: 32111.41);
-
+  void fetch() {
+    final apiClient = ApiClient(basePath: TRANSACTION_SUMMARY_API_URL);
+    apiClient.client = IMSPostClient();
+    final apiInstance = DefaultApi(apiClient);
 
     try {
-      var call = apiInstance.listTransactions("dhwanit");
+      GetAggregatedTransactionAnalysisByFiltersRequestContent request =
+          GetAggregatedTransactionAnalysisByFiltersRequestContent(
+              aggregationConfig:
+                  AggregationConfig(window: AggregationWindow.MONTH));
 
-      apiInstance.listTransactions("dhwanit").then((value) {
-        result =
-            TS.TransactionSummary(totalDebit: value!.aggregate.totalDebit ?? 0,
-                totalCredit: value!.aggregate.totalCredit ?? 0);
-            print(result.totalDebit);
-        }
-      );
-
-      print(result.totalDebit);
-
-      return result;
-
+      apiInstance
+          .getAggregatedTransactionAnalysisByFilters("dhwanit", request)
+          .then((value) {
+        creditDebitModel
+            .updateAggregationByType(value!.response.aggregationByType!);
+        debitByCategoryModel.update(value!.response.debitByCategory!);
+        creditByCategoryModel.update(value!.response.creditByCateegory!);
+      });
     } catch (e) {
-      rethrow;
+      creditDebitModel.updateAggregationByType(AggregationByType());
+      debitByCategoryModel.update(AggregationByCategory());
     }
   }
 }

@@ -5,6 +5,7 @@ namespace ims.core
 use aws.protocols#restJson1
 use aws.api#service
 
+
 @service(sdkId: "ImsCore")
 @restJson1
 @title("Investment Management Service")
@@ -13,7 +14,8 @@ This exposes transaction resource and also expose APIs to support transaction vi
 """)
 service ImsCore {
     version: "2022-05-19",
-    resources: [Transaction, Session]
+    resources: [Transaction, Session],
+    operations: [GetAggregatedTransactionAnalysisByFilters]
 }
 
 @documentation("""
@@ -68,6 +70,53 @@ operation ListTransactions {
     errors: [ErrorLoadingTransactions]
 }
 
+@http(uri: "/api/v1/core/{tlr}/transactions/analysis", method: "POST")
+operation GetAggregatedTransactionAnalysisByFilters {
+    input := {@required @httpLabel tlr: String, @required aggregationConfig: AggregationConfig}
+    output := {@required response: AnalysisResponse},
+    errors: [ErrorLoadingTransactions]
+}
+
+structure AggregationConfig {
+    window: AggregationWindow
+}
+
+enum AggregationWindow {
+    DAY,
+    MONTH,
+    WEEK,
+    YEAR
+}
+
+structure AnalysisResponse {
+    aggregationByType: AggregationByType,
+    debitByCategory: AggregationByCategory,
+    creditByCateegory: AggregationByCategory
+}
+
+structure AggregationByType {
+   credit: AggregationStatList,
+   debit: AggregationStatList
+}
+
+list AggregationStatList {
+    member: AggregationStat
+}
+
+structure AggregationStat {
+    windowName: String,
+    windowValue: Double
+}
+
+structure AggregationByCategory {
+    categoryToStatsMap: CategoryToStatsMap
+}
+
+map CategoryToStatsMap {
+   key: TransactionCategory,
+   value: AggregationStatList
+}
+
 @error("server")
 @documentation("This represents the internal error while fetching the transactions in server")
 structure ErrorLoadingTransactions {}
@@ -84,6 +133,7 @@ structure TransactionSummary {
     amount: Double,
     transactionDate: Timestamp,
     transactionPurpose: TransactionPurpose,
+    transactionDateString: String
 }
 
 structure TransactionPurpose {

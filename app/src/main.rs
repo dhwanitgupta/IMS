@@ -10,6 +10,7 @@ use log::{error, info};
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use crate::operations::get_aggregated_transaction_analysis_by_filters::get_aggregated_transaction_analysis_by_filters;
 use crate::operations::list_transactions::do_list_transactions;
 use crate::operations::start_session::do_start_session;
 use crate::state::State;
@@ -43,6 +44,9 @@ async fn main() {
     let app: Router = OperationRegistryBuilder::default()
         .list_transactions(do_list_transactions)
         .start_session(do_start_session)
+        .get_aggregated_transaction_analysis_by_filters(
+            get_aggregated_transaction_analysis_by_filters,
+        )
         .build()
         .expect("Unable to build operation registry")
         .into();
